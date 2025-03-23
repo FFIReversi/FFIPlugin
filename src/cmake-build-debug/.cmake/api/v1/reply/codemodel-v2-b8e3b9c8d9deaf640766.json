@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "/Users/kai/Desktop/FFI_Plugin/Reversi/src/cmake-build-debug",
-		"source" : "/Users/kai/Desktop/FFI_Plugin/Reversi/src"
+		"build" : "/Users/kai/Desktop/Reversi/src/cmake-build-debug",
+		"source" : "/Users/kai/Desktop/Reversi/src"
 	},
 	"version" : 
 	{

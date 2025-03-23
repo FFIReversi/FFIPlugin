@@ -45,6 +45,27 @@ class ReversiBindings {
   late final _getMovableArray = _getMovableArrayPtr.asFunction<
       ffi.Pointer<PairArray> Function(int, ffi.Pointer<IntArray>)>();
 
+  /// 落子
+  ffi.Pointer<IntArray> makeMove(
+    int player,
+    ffi.Pointer<IntArray> chessTable,
+    ffi.Pointer<PairStruct> dropPoint,
+  ) {
+    return _makeMove(
+      player,
+      chessTable,
+      dropPoint,
+    );
+  }
+
+  late final _makeMovePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<IntArray> Function(ffi.Int, ffi.Pointer<IntArray>,
+              ffi.Pointer<PairStruct>)>>('makeMove');
+  late final _makeMove = _makeMovePtr.asFunction<
+      ffi.Pointer<IntArray> Function(
+          int, ffi.Pointer<IntArray>, ffi.Pointer<PairStruct>)>();
+
   /// 釋放記憶體
   void freePairArray(
     ffi.Pointer<PairArray> pairArray,
@@ -59,6 +80,20 @@ class ReversiBindings {
           'freePairArray');
   late final _freePairArray =
       _freePairArrayPtr.asFunction<void Function(ffi.Pointer<PairArray>)>();
+
+  void freeIntArray(
+    ffi.Pointer<IntArray> intArray,
+  ) {
+    return _freeIntArray(
+      intArray,
+    );
+  }
+
+  late final _freeIntArrayPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<IntArray>)>>(
+          'freeIntArray');
+  late final _freeIntArray =
+      _freeIntArrayPtr.asFunction<void Function(ffi.Pointer<IntArray>)>();
 }
 
 final class IntArray extends ffi.Struct {

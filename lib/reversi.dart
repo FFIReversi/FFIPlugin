@@ -9,6 +9,8 @@ class Coordinates {
   int y = 0;
 }
 
+//TODO 顯示可吃的棋
+// 取得可以落子的地方
 List<Coordinates> getMovableArray(int player, List<int> chessTable) {
   ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
   ffi.Pointer<PairArray> resOfPointer = _bindings.getMovableArray(
@@ -19,6 +21,24 @@ List<Coordinates> getMovableArray(int player, List<int> chessTable) {
   chessTableOfPointer.release();
   _bindings.freePairArray(resOfPointer);
   return res;
+}
+
+// 落子，並回傳棋盤
+List<int> makeMove(int player, List<int> chessTable, Coordinates dropPoint) {
+  ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
+  ffi.Pointer<PairStruct> dropPointOfPointer = dropPoint.toPairStruct();
+  ffi.Pointer<IntArray> newChessTable =
+      _bindings.makeMove(player, chessTableOfPointer, dropPointOfPointer);
+
+  var newChessTableList = List<int>.empty(growable: true);
+  for (int i = 0; i < newChessTable.ref.size; i++) {
+    newChessTableList.add(newChessTable.ref.array[i]);
+  }
+
+  _bindings.freeIntArray(newChessTable);
+  chessTableOfPointer.release();
+  calloc.free(dropPointOfPointer);
+  return newChessTableList;
 }
 
 const String _libName = 'reversi';
@@ -74,5 +94,15 @@ extension ToListOfCoordinates on ffi.Pointer<PairArray> {
       list.add(coordinates);
     }
     return list;
+  }
+}
+
+extension ToPairStruct on Coordinates {
+  ffi.Pointer<PairStruct> toPairStruct() {
+    final pairStruct = calloc<PairStruct>();
+    pairStruct.ref
+      ..first = y
+      ..second = x;
+    return pairStruct;
   }
 }

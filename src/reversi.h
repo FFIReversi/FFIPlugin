@@ -32,8 +32,13 @@ enum Player {
 // 取得可以下的位置
 FFI_PLUGIN_EXPORT struct PairArray* getMovableArray(int player, struct IntArray* chessTable);
 
+// 落子
+FFI_PLUGIN_EXPORT struct IntArray* makeMove(int player,struct IntArray* chessTable,struct  PairStruct* dropPoint);
+
 // 釋放記憶體
 FFI_PLUGIN_EXPORT void freePairArray(struct PairArray* pairArray);
+
+FFI_PLUGIN_EXPORT void freeIntArray(struct IntArray* intArray);
 #ifdef __cplusplus
 }
 #endif

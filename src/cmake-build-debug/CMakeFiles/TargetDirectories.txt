@@ -1,3 +1,3 @@
-/Users/kai/Desktop/FFI_Plugin/Reversi/src/cmake-build-debug/CMakeFiles/reversi.dir
-/Users/kai/Desktop/FFI_Plugin/Reversi/src/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/kai/Desktop/FFI_Plugin/Reversi/src/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/Users/kai/Desktop/Reversi/src/cmake-build-debug/CMakeFiles/reversi.dir
+/Users/kai/Desktop/Reversi/src/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/kai/Desktop/Reversi/src/cmake-build-debug/CMakeFiles/rebuild_cache.dir
