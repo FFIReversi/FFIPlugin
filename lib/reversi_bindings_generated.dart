@@ -66,6 +66,60 @@ class ReversiBindings {
       ffi.Pointer<IntArray> Function(
           int, ffi.Pointer<IntArray>, ffi.Pointer<PairStruct>)>();
 
+  /// 使用Random的AI (Level 1)
+  ffi.Pointer<IntArray> aiRandom(
+    int player,
+    ffi.Pointer<IntArray> chessTable,
+  ) {
+    return _aiRandom(
+      player,
+      chessTable,
+    );
+  }
+
+  late final _aiRandomPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<IntArray> Function(
+              ffi.Int, ffi.Pointer<IntArray>)>>('aiRandom');
+  late final _aiRandom = _aiRandomPtr
+      .asFunction<ffi.Pointer<IntArray> Function(int, ffi.Pointer<IntArray>)>();
+
+  /// 使用貪婪演算法的AI (Level 2)
+  ffi.Pointer<IntArray> aiGreedy(
+    int player,
+    ffi.Pointer<IntArray> chessTable,
+  ) {
+    return _aiGreedy(
+      player,
+      chessTable,
+    );
+  }
+
+  late final _aiGreedyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<IntArray> Function(
+              ffi.Int, ffi.Pointer<IntArray>)>>('aiGreedy');
+  late final _aiGreedy = _aiGreedyPtr
+      .asFunction<ffi.Pointer<IntArray> Function(int, ffi.Pointer<IntArray>)>();
+
+  /// 使用貪婪+位置權重+吃子數量的AI (Level 3)
+  ffi.Pointer<IntArray> aiGreedyAlphaBeta(
+    int player,
+    ffi.Pointer<IntArray> chessTable,
+  ) {
+    return _aiGreedyAlphaBeta(
+      player,
+      chessTable,
+    );
+  }
+
+  late final _aiGreedyAlphaBetaPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<IntArray> Function(
+              ffi.Int, ffi.Pointer<IntArray>)>>('aiGreedyAlphaBeta');
+  late final _aiGreedyAlphaBeta = _aiGreedyAlphaBetaPtr
+      .asFunction<ffi.Pointer<IntArray> Function(int, ffi.Pointer<IntArray>)>();
+
   /// 釋放記憶體
   void freePairArray(
     ffi.Pointer<PairArray> pairArray,

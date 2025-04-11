@@ -41,6 +41,54 @@ List<int> makeMove(int player, List<int> chessTable, Coordinates dropPoint) {
   return newChessTableList;
 }
 
+// 使用Random的AI (Level 1)，Player是AI，回傳棋盤
+List<int> aiRandom(int player, List<int> chessTable) {
+  ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
+  ffi.Pointer<IntArray> newChessTable =
+      _bindings.aiRandom(player, chessTableOfPointer);
+
+  var newChessTableList = List<int>.empty(growable: true);
+  for (int i = 0; i < newChessTable.ref.size; i++) {
+    newChessTableList.add(newChessTable.ref.array[i]);
+  }
+
+  _bindings.freeIntArray(newChessTable);
+  chessTableOfPointer.release();
+  return newChessTableList;
+}
+
+// 使用貪婪的AI (Level 2)，Player是AI，回傳棋盤
+List<int> aiGreedy(int player, List<int> chessTable) {
+  ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
+  ffi.Pointer<IntArray> newChessTable =
+      _bindings.aiGreedy(player, chessTableOfPointer);
+
+  var newChessTableList = List<int>.empty(growable: true);
+  for (int i = 0; i < newChessTable.ref.size; i++) {
+    newChessTableList.add(newChessTable.ref.array[i]);
+  }
+
+  _bindings.freeIntArray(newChessTable);
+  chessTableOfPointer.release();
+  return newChessTableList;
+}
+
+// 使用貪婪+位置權重+吃子數量的AI (Level 3)，Player是AI，回傳棋盤
+List<int> aiGreedyAlphaBeta(int player, List<int> chessTable) {
+  ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
+  ffi.Pointer<IntArray> newChessTable =
+      _bindings.aiGreedyAlphaBeta(player, chessTableOfPointer);
+
+  var newChessTableList = List<int>.empty(growable: true);
+  for (int i = 0; i < newChessTable.ref.size; i++) {
+    newChessTableList.add(newChessTable.ref.array[i]);
+  }
+
+  _bindings.freeIntArray(newChessTable);
+  chessTableOfPointer.release();
+  return newChessTableList;
+}
+
 const String _libName = 'reversi';
 
 /// The dynamic library in which the symbols for [FfiPluginBindings] can be found.

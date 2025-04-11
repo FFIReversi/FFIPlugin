@@ -10,6 +10,7 @@ using namespace std;
 int dx[8] = {1, -1, 0, 0, 1, 1, -1, -1};
 int dy[8] = {0, 0, 1, -1, 1, -1, 1, -1};
 
+// 確認該點是否可落子
 FFI_PLUGIN_EXPORT bool isMovable(int player, vector<vector<int> > chessTable, pair<int, int> position, int dx, int dy) {
     int y = position.first;
     int x = position.second;
@@ -30,6 +31,7 @@ FFI_PLUGIN_EXPORT bool isMovable(int player, vector<vector<int> > chessTable, pa
     return false;
 }
 
+// 取得可以翻的棋子
 FFI_PLUGIN_EXPORT vector<pair<int, int> > getFlipChess(int player, vector<vector<int> > chessTable,
                                                        pair<int, int> position, int dx, int dy) {
     int y = position.first;
@@ -64,6 +66,7 @@ FFI_PLUGIN_EXPORT vector<pair<int, int> > getFlipChess(int player, vector<vector
     return theChessCanFlip;
 }
 
+// 取得所有可以下的點
 FFI_PLUGIN_EXPORT PairArray *getMovableArray(int player, IntArray *chessTable) {
     if (chessTable->size != 64) {
         auto *result = new PairArray;
@@ -77,6 +80,7 @@ FFI_PLUGIN_EXPORT PairArray *getMovableArray(int player, IntArray *chessTable) {
     // 立體化陣列
     for (int i = 0; i < 8; i++) {
         vector<int> row;
+        row.reserve(8);
         for (int j = 0; j < 8; j++) {
             row.emplace_back(chessTable->array[8 * i + j]);
         }
@@ -107,10 +111,11 @@ FFI_PLUGIN_EXPORT PairArray *getMovableArray(int player, IntArray *chessTable) {
     return result;
 }
 
-FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTable, struct PairStruct* dropPoint) {
+// 落子
+FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTable, struct PairStruct *dropPoint) {
     int x = dropPoint->first;
     int y = dropPoint->second;
-    if (chessTable->size != 64 || x>7 || y>7 || x<0 || y<0) {
+    if (chessTable->size != 64 || x > 7 || y > 7 || x < 0 || y < 0) {
         auto *result = new IntArray;
         result->array = new int[0];
         result->size = 0;
@@ -122,6 +127,7 @@ FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTa
     // 立體化陣列
     for (int i = 0; i < 8; i++) {
         vector<int> row;
+        row.reserve(8);
         for (int j = 0; j < 8; j++) {
             row.emplace_back(chessTable->array[8 * i + j]);
         }
@@ -131,13 +137,14 @@ FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTa
     set<pair<int, int> > theChessCanFlip;
     // 取得被吃的棋子
     for (int i = 0; i < 8; i++) {
-        vector<pair<int,int> > flipChess =  getFlipChess(player, chessTableVector, make_pair(dropPoint->first, dropPoint->second), dx[i], dy[i]);
-        for (auto it:flipChess) {
+        vector<pair<int, int> > flipChess = getFlipChess(player, chessTableVector,
+                                                         make_pair(dropPoint->first, dropPoint->second), dx[i], dy[i]);
+        for (auto it: flipChess) {
             theChessCanFlip.insert(it);
         }
     }
 
-    for (auto it:theChessCanFlip) {
+    for (auto it: theChessCanFlip) {
         chessTableVector[it.first][it.second] = player;
     }
     if (!theChessCanFlip.empty()) {
@@ -156,6 +163,7 @@ FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTa
     return result;
 }
 
+// 釋放記憶體
 FFI_PLUGIN_EXPORT void freePairArray(PairArray *pairArray) {
     delete[] pairArray->array;
     delete[] pairArray;
@@ -166,28 +174,186 @@ FFI_PLUGIN_EXPORT void freeIntArray(IntArray *IntArray) {
     delete[] IntArray;
 }
 
-int main() {
-    int chessTable[64] = {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 2, 1, 0, 0, 0,
-        0, 0, 0, 1, 2, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
+// 利用Random的AI
+FFI_PLUGIN_EXPORT struct IntArray *aiRandom(int player, struct IntArray *chessTable) {
+    PairArray *allMovableArray = getMovableArray(player, chessTable);
+    if (allMovableArray->size == 0) {
+        freePairArray(allMovableArray);
+        return chessTable;
+    }
+    srand(time(NULL));
+    int dropIndex = rand() % allMovableArray->size;
+    IntArray *result = makeMove(player, chessTable, &allMovableArray->array[dropIndex]);
+    freePairArray(allMovableArray);
+    return result;
+}
+
+// 單純貪婪的AI
+FFI_PLUGIN_EXPORT struct IntArray *aiGreedy(int player, struct IntArray *chessTable) {
+    PairArray *allMovableArray = getMovableArray(player, chessTable);
+
+    // 棋盤vector
+    vector<vector<int> > chessTableVector;
+    // 立體化陣列
+    for (int i = 0; i < 8; i++) {
+        vector<int> row;
+        row.reserve(8);
+        for (int j = 0; j < 8; j++) {
+            row.emplace_back(chessTable->array[8 * i + j]);
+        }
+        chessTableVector.emplace_back(row);
+    }
+
+    int maxFlipCount = 0;
+    pair<int, int> movePoint;
+    if (allMovableArray->size == 0) {
+        freePairArray(allMovableArray);
+        return chessTable;
+    }
+    for (int i = 0; i < allMovableArray->size; i++) {
+        // 可以下的點
+        PairStruct point = allMovableArray->array[i];
+        set<pair<int, int> > theChessCanFlip;
+
+        // 取得吃子
+        for (int k = 0; k < 8; k++) {
+            vector<pair<int, int> > chessCanFlipInThisDirection = getFlipChess(player, chessTableVector,
+                                                                               make_pair(point.first, point.second),
+                                                                               dx[k], dy[k]);
+
+            for (auto it: chessCanFlipInThisDirection) {
+                theChessCanFlip.insert(it);
+            }
+        }
+
+        if (theChessCanFlip.size() > maxFlipCount) {
+            maxFlipCount = static_cast<int>(theChessCanFlip.size());
+            movePoint.first = point.first;
+            movePoint.second = point.second;
+        }
+    }
+    freePairArray(allMovableArray);
+    PairStruct movePointPairStruct = {};
+    movePointPairStruct.first = movePoint.first;
+    movePointPairStruct.second = movePoint.second;
+    return makeMove(player, chessTable, &movePointPairStruct);
+}
+
+// 加上 α β 的貪婪的AI
+FFI_PLUGIN_EXPORT struct IntArray *aiGreedyAlphaBeta(int player, struct IntArray *chessTable) {
+    PairArray *allMovableArray = getMovableArray(player, chessTable);
+
+    // 棋盤vector
+    vector<vector<int> > chessTableVector;
+    // 立體化陣列
+    for (int i = 0; i < 8; i++) {
+        vector<int> row;
+        row.reserve(8);
+        for (int j = 0; j < 8; j++) {
+            row.emplace_back(chessTable->array[8 * i + j]);
+        }
+        chessTableVector.emplace_back(row);
+    }
+
+    int chessCount = 0;
+    for (auto i: chessTableVector) {
+        for (auto j: i) {
+            if (j != 0) {
+                chessCount++;
+            }
+        }
+    }
+
+    // a = 位置權重α, b = 吃子數β
+    int a = 1, b;
+    if (chessCount < 20) {
+        b = 10;
+    } else if (chessCount < 45) {
+        b = 15;
+    } else {
+        b = 25;
+    }
+
+    // 位置權重
+    int bonusPointOfPosition[8][8] = {
+        {100, -20, 10, 5, 5, 10, -20, 100},
+        {-20, -50, -2, -2, -2, -2, -50, -20},
+        {10, -2, 0, 0, 0, 0, -2, 10},
+        {5, -2, 0, 0, 0, 0, -2, 5},
+        {5, -2, 0, 0, 0, 0, -2, 5},
+        {10, -2, 0, 0, 0, 0, -2, 10},
+        {-20, -50, -2, -2, -2, -2, -50, -20},
+        {100, -20, 10, 5, 5, 10, -20, 100}
     };
 
-    IntArray ia;
+    int maxScore = 0;
+    pair<int, int> movePoint;
+    if (allMovableArray->size == 0) {
+        freePairArray(allMovableArray);
+        return chessTable;
+    }
+    for (int i = 0; i < allMovableArray->size; i++) {
+        // 可以下的點
+        PairStruct point = allMovableArray->array[i];
+        set<pair<int, int> > theChessCanFlip;
+
+        // 取得吃子
+        for (int k = 0; k < 8; k++) {
+            vector<pair<int, int> > chessCanFlipInThisDirection = getFlipChess(player, chessTableVector,
+                                                                               make_pair(point.first, point.second),
+                                                                               dx[k], dy[k]);
+
+            for (auto it: chessCanFlipInThisDirection) {
+                theChessCanFlip.insert(it);
+            }
+        }
+
+        int thisScore = bonusPointOfPosition[point.first][point.second] * a + static_cast<int>(theChessCanFlip.size()) *
+                        b;
+        if (thisScore > maxScore) {
+            maxScore = static_cast<int>(theChessCanFlip.size());
+            movePoint.first = point.first;
+            movePoint.second = point.second;
+        }
+    }
+    freePairArray(allMovableArray);
+    PairStruct movePointPairStruct = {};
+    movePointPairStruct.first = movePoint.first;
+    movePointPairStruct.second = movePoint.second;
+    return makeMove(player, chessTable, &movePointPairStruct);
+}
+
+int main() {
+    int chessTable[64] = {
+        0, 0, 0, 1, 0, 0, 0, 0,
+        0, 1, 0, 1, 0, 0, 0, 0,
+        2, 1, 1, 1, 2, 1, 0, 0,
+        0, 1, 0, 2, 2, 0, 0, 0,
+        0, 1, 2, 1, 2, 0, 0, 0,
+        0, 2, 1, 0, 0, 0, 0, 0,
+        2, 1, 0, 0, 0, 0, 0, 0,
+        0, 1, 0, 0, 0, 0, 0, 0,
+    };
+
+    IntArray ia = {};
     ia.array = chessTable;
     ia.size = 64;
-    PairStruct pos = {2, 3};
-    IntArray *res = makeMove(1, &ia, &pos);
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            cout << res->array[i * 8 + j];
-        }
-        cout << endl;
-    }
+    // PairStruct pos = {2, 3};
+    // IntArray *res = makeMove(1, &ia, &pos);
+    // for (int i = 0; i < 8; i++) {
+    //     for (int j = 0; j < 8; j++) {
+    //         cout << res->array[i * 8 + j];
+    //     }
+    //     cout << endl;
+    // }
+    // freeIntArray(res);
+    IntArray *res = aiGreedyAlphaBeta(2, &ia);
+
+    // for (int i = 0; i < 8; i++) {
+    //     for (int j = 0; j < 8; j++) {
+    //         cout << res->array[i * 8 + j];
+    //     }
+    //     cout << endl;
+    // }
     freeIntArray(res);
 }
