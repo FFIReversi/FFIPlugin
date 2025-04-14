@@ -181,7 +181,7 @@ FFI_PLUGIN_EXPORT struct IntArray *aiRandom(int player, struct IntArray *chessTa
         freePairArray(allMovableArray);
         return chessTable;
     }
-    srand(time(NULL));
+    srand(static_cast<unsigned int>(time(NULL)));
     int dropIndex = rand() % allMovableArray->size;
     IntArray *result = makeMove(player, chessTable, &allMovableArray->array[dropIndex]);
     freePairArray(allMovableArray);
