@@ -66,7 +66,7 @@ List<int> aiRandom(int player, List<int> chessTable) {
   }
 
   _bindings.freeIntArray(newChessTable);
-  _bindings.freeIntArray(chessTableOfPointer);
+  chessTableOfPointer.release();
   return newChessTableList;
 }
 
@@ -75,15 +75,20 @@ List<int> aiGreedy(int player, List<int> chessTable) {
   ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
   ffi.Pointer<IntArray> newChessTable =
       _bindings.aiGreedy(player, chessTableOfPointer);
+  try {
+    chessTableOfPointer = chessTable.toIntArrayPointer();
+    newChessTable = _bindings.aiGreedy(player, chessTableOfPointer);
 
-  var newChessTableList = List<int>.empty(growable: true);
-  for (int i = 0; i < newChessTable.ref.size; i++) {
-    newChessTableList.add(newChessTable.ref.array[i]);
+    var newChessTableList = List<int>.empty(growable: true);
+    for (int i = 0; i < newChessTable.ref.size; i++) {
+      newChessTableList.add(newChessTable.ref.array[i]);
+    }
+
+    return newChessTableList;
+  } finally {
+    _bindings.freeIntArray(newChessTable);
+    chessTableOfPointer.release();
   }
-
-  _bindings.freeIntArray(newChessTable);
-  _bindings.freeIntArray(chessTableOfPointer);
-  return newChessTableList;
 }
 
 // 使用貪婪+位置權重+吃子數量的AI (Level 3)，Player是AI，回傳棋盤
@@ -98,7 +103,7 @@ List<int> aiGreedyAlphaBeta(int player, List<int> chessTable) {
   }
 
   _bindings.freeIntArray(newChessTable);
-  _bindings.freeIntArray(chessTableOfPointer);
+  chessTableOfPointer.release();
   return newChessTableList;
 }
 

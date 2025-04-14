@@ -231,7 +231,13 @@ FFI_PLUGIN_EXPORT struct IntArray *aiRandom(int player, struct IntArray *chessTa
     PairArray *allMovableArray = getMovableArray(player, chessTable);
     if (allMovableArray->size == 0) {
         freePairArray(allMovableArray);
-        return chessTable;
+        auto *result = new IntArray;
+        result->array = new int[64];
+        result->size = 64;
+        for (int i = 0; i < 64; i++) {
+            result->array[i] = chessTable->array[i];
+        }
+        return result;
     }
     srand(static_cast<unsigned int>(time(NULL)));
     int dropIndex = rand() % allMovableArray->size;
@@ -260,7 +266,13 @@ FFI_PLUGIN_EXPORT struct IntArray *aiGreedy(int player, struct IntArray *chessTa
     pair<int, int> movePoint;
     if (allMovableArray->size == 0) {
         freePairArray(allMovableArray);
-        return chessTable;
+        auto *result = new IntArray;
+        result->array = new int[64];
+        result->size = 64;
+        for (int i = 0; i < 64; i++) {
+            result->array[i] = chessTable->array[i];
+        }
+        return result;
     }
     for (int i = 0; i < allMovableArray->size; i++) {
         // 可以下的點
@@ -342,7 +354,13 @@ FFI_PLUGIN_EXPORT struct IntArray *aiGreedyAlphaBeta(int player, struct IntArray
     pair<int, int> movePoint;
     if (allMovableArray->size == 0) {
         freePairArray(allMovableArray);
-        return chessTable;
+        auto *result = new IntArray;
+        result->array = new int[64];
+        result->size = 64;
+        for (int i = 0; i < 64; i++) {
+            result->array[i] = chessTable->array[i];
+        }
+        return result;
     }
     for (int i = 0; i < allMovableArray->size; i++) {
         // 可以下的點
