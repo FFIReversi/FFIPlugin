@@ -112,7 +112,8 @@ FFI_PLUGIN_EXPORT PairArray *getMovableArray(int player, IntArray *chessTable) {
 }
 
 // 可以吃的棋
-FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable, struct PairStruct *findPoint){
+FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable,
+                                                     struct PairStruct *findPoint) {
     if (chessTable->size != 64) {
         auto *result = new PairArray;
         result->array = new PairStruct[0];
@@ -137,6 +138,9 @@ FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray
         vector<pair<int, int> > flipChess = getFlipChess(player, chessTableVector,
                                                          make_pair(findPoint->first, findPoint->second), dx[i], dy[i]);
         for (auto it: flipChess) {
+            if (chessTableVector[it.first][it.second] == player) {
+                continue;
+            }
             theChessCanFlip.insert(it);
         }
     }
@@ -145,7 +149,7 @@ FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray
     vector<pair<int, int> > flipVector;
     flipVector.reserve(theChessCanFlip.size());
     for (auto it: theChessCanFlip) {
-        flipVector.emplace_back(make_pair(it.first, it.second));
+        flipVector.emplace_back(it);
     }
 
     // 扁平化陣列
@@ -373,29 +377,27 @@ FFI_PLUGIN_EXPORT struct IntArray *aiGreedyAlphaBeta(int player, struct IntArray
 
 int main() {
     int chessTable[64] = {
-        0, 0, 0, 1, 0, 0, 0, 0,
-        0, 1, 0, 1, 0, 0, 0, 0,
-        2, 1, 1, 1, 2, 1, 0, 0,
-        0, 1, 0, 2, 2, 0, 0, 0,
-        0, 1, 2, 1, 2, 0, 0, 0,
-        0, 2, 1, 0, 0, 0, 0, 0,
-        2, 1, 0, 0, 0, 0, 0, 0,
-        0, 1, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 2, 1, 0, 0, 0,
+        0, 0, 0, 1, 2, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
     };
 
     IntArray ia = {};
     ia.array = chessTable;
     ia.size = 64;
-    // PairStruct pos = {2, 3};
+    PairStruct pos = {2, 4};
+    PairArray *res = getAllCanFlipped(2, &ia, &pos);
     // IntArray *res = makeMove(1, &ia, &pos);
-    // for (int i = 0; i < 8; i++) {
-    //     for (int j = 0; j < 8; j++) {
-    //         cout << res->array[i * 8 + j];
-    //     }
-    //     cout << endl;
-    // }
+    for (int i = 0; i < res->size; i++) {
+        cout << res->array[i].first << " " << res->array[i].second << endl;
+    }
     // freeIntArray(res);
-    IntArray *res = aiGreedyAlphaBeta(2, &ia);
+    // IntArray *res = aiGreedyAlphaBeta(2, &ia);
 
     // for (int i = 0; i < 8; i++) {
     //     for (int j = 0; j < 8; j++) {
@@ -403,5 +405,5 @@ int main() {
     //     }
     //     cout << endl;
     // }
-    freeIntArray(res);
+    freePairArray(res);
 }
