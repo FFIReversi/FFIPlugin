@@ -137,8 +137,8 @@ extension ToListOfCoordinates on ffi.Pointer<PairArray> {
     ffi.Pointer<PairStruct> pairArray = ref.array;
     for (int i = 0; i < ref.size; i++) {
       Coordinates coordinates = Coordinates();
-      coordinates.x = pairArray[i].first;
-      coordinates.y = pairArray[i].second;
+      coordinates.y = pairArray[i].first;
+      coordinates.x = pairArray[i].second;
       list.add(coordinates);
     }
     return list;
