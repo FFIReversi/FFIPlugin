@@ -111,6 +111,58 @@ FFI_PLUGIN_EXPORT PairArray *getMovableArray(int player, IntArray *chessTable) {
     return result;
 }
 
+// 可以吃的棋
+FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable) {
+    if (chessTable->size != 64) {
+        auto *result = new PairArray;
+        result->array = new PairStruct[0];
+        result->size = 0;
+        return result;
+    }
+
+    // 棋盤vector
+    vector<vector<int> > chessTableVector;
+    // 立體化陣列
+    for (int i = 0; i < 8; i++) {
+        vector<int> row;
+        row.reserve(8);
+        for (int j = 0; j < 8; j++) {
+            row.emplace_back(chessTable->array[8 * i + j]);
+        }
+        chessTableVector.emplace_back(row);
+    }
+
+    set<pair<int, int> > theChessCanFlip;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            // 取得被吃的棋子
+            for (int k = 0; k < 8; k++) {
+                vector<pair<int, int> > flipChess = getFlipChess(player, chessTableVector,
+                                                                 make_pair(i, j), dx[k], dy[k]);
+                for (auto it: flipChess) {
+                    theChessCanFlip.insert(it);
+                }
+            }
+        }
+    }
+
+    vector<pair<int, int> > flipVector;
+    flipVector.reserve(theChessCanFlip.size());
+    for (auto it: theChessCanFlip) {
+        flipVector.emplace_back(make_pair(it.first, it.second));
+    }
+
+    // 扁平化陣列
+    auto *result = new PairArray;
+    result->array = new PairStruct[theChessCanFlip.size()];
+    result->size = static_cast<int>(theChessCanFlip.size());
+    for (int i = 0; i < theChessCanFlip.size(); i++) {
+        result->array[i].first = flipVector[i].first;
+        result->array[i].second = flipVector[i].second;
+    }
+    return result;
+}
+
 // 落子
 FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTable, struct PairStruct *dropPoint) {
     int x = dropPoint->first;

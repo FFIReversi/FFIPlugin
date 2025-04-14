@@ -66,6 +66,24 @@ class ReversiBindings {
       ffi.Pointer<IntArray> Function(
           int, ffi.Pointer<IntArray>, ffi.Pointer<PairStruct>)>();
 
+  /// 可以吃的棋
+  ffi.Pointer<PairArray> getAllCanFlipped(
+    int player,
+    ffi.Pointer<IntArray> chessTable,
+  ) {
+    return _getAllCanFlipped(
+      player,
+      chessTable,
+    );
+  }
+
+  late final _getAllCanFlippedPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<PairArray> Function(
+              ffi.Int, ffi.Pointer<IntArray>)>>('getAllCanFlipped');
+  late final _getAllCanFlipped = _getAllCanFlippedPtr.asFunction<
+      ffi.Pointer<PairArray> Function(int, ffi.Pointer<IntArray>)>();
+
   /// 使用Random的AI (Level 1)
   ffi.Pointer<IntArray> aiRandom(
     int player,

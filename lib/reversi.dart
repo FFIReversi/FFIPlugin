@@ -9,11 +9,23 @@ class Coordinates {
   int y = 0;
 }
 
-//TODO 顯示可吃的棋
 // 取得可以落子的地方
 List<Coordinates> getMovableArray(int player, List<int> chessTable) {
   ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
   ffi.Pointer<PairArray> resOfPointer = _bindings.getMovableArray(
+    player,
+    chessTableOfPointer,
+  );
+  List<Coordinates> res = resOfPointer.toListOfCoordinates();
+  chessTableOfPointer.release();
+  _bindings.freePairArray(resOfPointer);
+  return res;
+}
+
+// 取得可以吃的棋
+List<Coordinates> getAllCanFlipped(int player, List<int> chessTable) {
+  ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
+  ffi.Pointer<PairArray> resOfPointer = _bindings.getAllCanFlipped(
     player,
     chessTableOfPointer,
   );
