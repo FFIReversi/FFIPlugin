@@ -23,15 +23,16 @@ List<Coordinates> getMovableArray(int player, List<int> chessTable) {
 }
 
 // 取得可以吃的棋
-List<Coordinates> getAllCanFlipped(int player, List<int> chessTable) {
+List<Coordinates> getAllCanFlipped(
+    int player, List<int> chessTable, Coordinates findPoint) {
   ffi.Pointer<IntArray> chessTableOfPointer = chessTable.toIntArrayPointer();
+  ffi.Pointer<PairStruct> findPointOfPointer = findPoint.toPairStruct();
   ffi.Pointer<PairArray> resOfPointer = _bindings.getAllCanFlipped(
-    player,
-    chessTableOfPointer,
-  );
+      player, chessTableOfPointer, findPointOfPointer);
   List<Coordinates> res = resOfPointer.toListOfCoordinates();
   chessTableOfPointer.release();
   _bindings.freePairArray(resOfPointer);
+  calloc.free(findPointOfPointer);
   return res;
 }
 

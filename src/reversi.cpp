@@ -112,7 +112,7 @@ FFI_PLUGIN_EXPORT PairArray *getMovableArray(int player, IntArray *chessTable) {
 }
 
 // 可以吃的棋
-FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable) {
+FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable, struct PairStruct *findPoint){
     if (chessTable->size != 64) {
         auto *result = new PairArray;
         result->array = new PairStruct[0];
@@ -134,17 +134,13 @@ FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray
 
     set<pair<int, int> > theChessCanFlip;
     for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 8; j++) {
-            // 取得被吃的棋子
-            for (int k = 0; k < 8; k++) {
-                vector<pair<int, int> > flipChess = getFlipChess(player, chessTableVector,
-                                                                 make_pair(i, j), dx[k], dy[k]);
-                for (auto it: flipChess) {
-                    theChessCanFlip.insert(it);
-                }
-            }
+        vector<pair<int, int> > flipChess = getFlipChess(player, chessTableVector,
+                                                         make_pair(findPoint->first, findPoint->second), dx[i], dy[i]);
+        for (auto it: flipChess) {
+            theChessCanFlip.insert(it);
         }
     }
+
 
     vector<pair<int, int> > flipVector;
     flipVector.reserve(theChessCanFlip.size());

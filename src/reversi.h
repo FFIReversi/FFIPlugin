@@ -36,7 +36,7 @@ FFI_PLUGIN_EXPORT struct PairArray *getMovableArray(int player, struct IntArray 
 FFI_PLUGIN_EXPORT struct IntArray *makeMove(int player, struct IntArray *chessTable, struct PairStruct *dropPoint);
 
 // 可以吃的棋
-FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable);
+FFI_PLUGIN_EXPORT struct PairArray *getAllCanFlipped(int player, struct IntArray *chessTable, struct PairStruct *findPoint);
 
 // 使用Random的AI (Level 1)
 FFI_PLUGIN_EXPORT struct IntArray *aiRandom(int player, struct IntArray *chessTable);
