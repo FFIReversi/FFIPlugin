@@ -66,7 +66,7 @@ List<int> aiRandom(int player, List<int> chessTable) {
   }
 
   _bindings.freeIntArray(newChessTable);
-  chessTableOfPointer.release();
+  _bindings.freeIntArray(chessTableOfPointer);
   return newChessTableList;
 }
 
@@ -82,7 +82,7 @@ List<int> aiGreedy(int player, List<int> chessTable) {
   }
 
   _bindings.freeIntArray(newChessTable);
-  chessTableOfPointer.release();
+  _bindings.freeIntArray(chessTableOfPointer);
   return newChessTableList;
 }
 
@@ -98,7 +98,7 @@ List<int> aiGreedyAlphaBeta(int player, List<int> chessTable) {
   }
 
   _bindings.freeIntArray(newChessTable);
-  chessTableOfPointer.release();
+  _bindings.freeIntArray(chessTableOfPointer);
   return newChessTableList;
 }
 
