@@ -375,35 +375,35 @@ FFI_PLUGIN_EXPORT struct IntArray *aiGreedyAlphaBeta(int player, struct IntArray
     return makeMove(player, chessTable, &movePointPairStruct);
 }
 
-int main() {
-    int chessTable[64] = {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 2, 1, 0, 0, 0,
-        0, 0, 0, 1, 2, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0,
-    };
-
-    IntArray ia = {};
-    ia.array = chessTable;
-    ia.size = 64;
-    PairStruct pos = {2, 4};
-    PairArray *res = getAllCanFlipped(2, &ia, &pos);
-    // IntArray *res = makeMove(1, &ia, &pos);
-    for (int i = 0; i < res->size; i++) {
-        cout << res->array[i].first << " " << res->array[i].second << endl;
-    }
-    // freeIntArray(res);
-    // IntArray *res = aiGreedyAlphaBeta(2, &ia);
-
-    // for (int i = 0; i < 8; i++) {
-    //     for (int j = 0; j < 8; j++) {
-    //         cout << res->array[i * 8 + j];
-    //     }
-    //     cout << endl;
-    // }
-    freePairArray(res);
-}
+// int main() {
+//     int chessTable[64] = {
+//         2, 2, 2, 2, 2, 2, 2, 2,
+//         2, 2, 1, 1, 1, 2, 2, 2,
+//         2, 2, 2, 1, 1, 1, 1, 2,
+//         0, 2, 1, 1, 1, 2, 1, 2,
+//         2, 2, 1, 1, 1, 2, 1, 2,
+//         2, 1, 2, 2, 1, 2, 1, 2,
+//         2, 2, 1, 1, 1, 1, 2, 2,
+//         2, 2, 2, 2, 1, 2, 2, 2,
+//     };
+//
+//     IntArray ia = {};
+//     ia.array = chessTable;
+//     ia.size = 64;
+//     PairStruct pos = {2, 4};
+//     PairArray *res = getMovableArray(1, &ia);
+//     // IntArray *res = makeMove(1, &ia, &pos);
+//     for (int i = 0; i < res->size; i++) {
+//         cout << res->array[i].first << " " << res->array[i].second << endl;
+//     }
+//     // freeIntArray(res);
+//     // IntArray *res = aiGreedyAlphaBeta(2, &ia);
+//
+//     // for (int i = 0; i < 8; i++) {
+//     //     for (int j = 0; j < 8; j++) {
+//     //         cout << res->array[i * 8 + j];
+//     //     }
+//     //     cout << endl;
+//     // }
+//     freePairArray(res);
+// }
